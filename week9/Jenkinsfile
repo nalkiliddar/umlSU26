@@ -46,7 +46,8 @@ pipeline {
                 }
             }
             steps {
-                sh 'python week9/publish_event.py'
+                withEnv(["BROKER=${BROKER}", "TOPIC=${TOPIC}"]) {
+                    sh 'python week9/publish_event.py'
             }
         }
     }
