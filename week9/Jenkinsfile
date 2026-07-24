@@ -6,7 +6,7 @@ pipeline {
         REGISTRY = 'localhost:5001'
         IMAGE    = 'calculator'
         TAG      = "${BUILD_NUMBER}"
-        TOPIC    = 'ci.images'
+        TOPIC    = 'orders'
         BROKER   = 'week9-kafka:29092' 
     }
     stages {
