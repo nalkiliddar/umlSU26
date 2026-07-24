@@ -7,7 +7,7 @@ pipeline {
         IMAGE    = 'calculator'
         TAG      = "${BUILD_NUMBER}"
         TOPIC    = 'ci.images'
-        BROKER   = 'week9-kafka:9092' 
+        BROKER   = 'week9-kafka:29092' 
     }
     stages {
         stage('Checkout code') {
