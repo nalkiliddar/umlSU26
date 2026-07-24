@@ -11,17 +11,26 @@
 // insecure by default. That's the simpler version of the earlier TLS + htpasswd
 // setup.
 pipeline {
-    agent none
+    agent any
     environment {
         REGISTRY = 'localhost:5001'
         IMAGE    = 'calculator'
         TAG      = "${BUILD_NUMBER}"
         TOPIC    = 'ci.images'
-        BROKER   = 'week9-kafka:29092'
+        BROKER   = 'week9-kafka:9092'
     }
     stages {
+        stage('Checkout code') {
+            steps { 
+                git url: 'https://github.com/nalkiliddar/umlSU26', branch: 'main'
+                sh """
+                cd week9
+                
+                """
+            }
+        }
         stage('Build & push image') {
-            agent any
+            
             steps {
                 sh '''
                     docker build -t ${REGISTRY}/${IMAGE}:${TAG} week9/app
