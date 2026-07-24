@@ -18,6 +18,6 @@ event = {
     "registry": "localhost:5001",
     "branch": os.environ.get("BRANCH", "main"),
 }
-producer.send(os.environ.get("TOPIC", "ci.images"), event).get(timeout=10)
+producer.send(os.environ.get("TOPIC", "orders"), event).get(timeout=10)
 producer.flush()
 print("announced to Kafka:", event)
