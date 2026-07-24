@@ -11,7 +11,7 @@
 // insecure by default. That's the simpler version of the earlier TLS + htpasswd
 // setup.
 pipeline {
-    agent any
+    agent none
     environment {
         REGISTRY = 'localhost:5001'
         IMAGE    = 'calculator'
@@ -48,6 +48,7 @@ pipeline {
             steps {
                 withEnv(["BROKER=${BROKER}", "TOPIC=${TOPIC}"]) {
                     sh 'python week9/publish_event.py'
+                }    
             }
         }
     }
