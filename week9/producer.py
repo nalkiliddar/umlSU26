@@ -15,15 +15,15 @@ from kafka import KafkaProducer
 # These ids spread across all three partitions of a 3-partition topic.
 events = [
     ("INC123", "Ticket_created"), ("INC456", "Ticket_created"), ("INC789", "Ticket_created"), ("INC1112", "Ticket_created"),
-    ("INC1516", "Ticket_created"), ("INC1314", "Ticket_created"), ("INC123", "IAssigned"),    ("INC456", "Assigned"),
+    ("INC1516", "Ticket_created"), ("INC1314", "Ticket_created"), ("INC123", "Assigned"),    ("INC456", "Assigned"),
     ("INC789", "Assigned"),    ("INC1516", "In-Progress"), ("INC1314", "Assigned"),    ("INC1112", "In-Progress"),
     ("INC123", "In-Progress"), ("INC123", "Resolved"),
 ]
 
-for order_id, status in events:
-    event = {"order_id": order_id, "status": status}
+for ticket_id, status in events:
+    event = {"ticket_id": ticket_id, "status": status}
     md = producer.send(TOPIC, key=ticket_id, value=event).get(timeout=10)
-    print(f"order {order_id:<3} {status:<10} -> partition {md.partition} offset {md.offset}")
+    print(f"ticket {ticket_id:<3} {status:<10} -> partition {md.partition} offset {md.offset}")
     time.sleep(0.3)
 
 producer.flush()
