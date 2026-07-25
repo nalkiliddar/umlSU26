@@ -39,7 +39,7 @@ print(f"[{NAME}] joined group 'tickets-workers'; waiting for assignment (Ctrl-C 
 
 try:
     for m in consumer:
-        print(f"[{NAME}] p{m.partition} off{m.offset}  order {m.value['ticket_id']} {m.value['status']}", flush=True)
+        print(f"[{NAME}] p{m.partition} off{m.offset}  ticket {m.value['ticket_id']} {m.value['status']}", flush=True)
 except KeyboardInterrupt:
     pass
 finally:
