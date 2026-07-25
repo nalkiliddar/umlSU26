@@ -16,7 +16,7 @@ from kafka import KafkaConsumer
 from kafka.consumer.subscription_state import ConsumerRebalanceListener
 
 BROKER = "localhost:9092"
-TOPIC = "orders"
+TOPIC = "tickets"
 NAME = os.environ.get("NAME", "consumer")
 
 
@@ -30,16 +30,16 @@ class AssignmentLogger(ConsumerRebalanceListener):
 
 consumer = KafkaConsumer(
     bootstrap_servers=BROKER,
-    group_id="orders-workers",
+    group_id="tickets-workers",
     auto_offset_reset="earliest",
     value_deserializer=lambda b: json.loads(b.decode("utf-8")),
 )
 consumer.subscribe([TOPIC], listener=AssignmentLogger())
-print(f"[{NAME}] joined group 'orders-workers'; waiting for assignment (Ctrl-C to stop)...", flush=True)
+print(f"[{NAME}] joined group 'tickets-workers'; waiting for assignment (Ctrl-C to stop)...", flush=True)
 
 try:
     for m in consumer:
-        print(f"[{NAME}] p{m.partition} off{m.offset}  order {m.value['order_id']} {m.value['status']}", flush=True)
+        print(f"[{NAME}] p{m.partition} off{m.offset}  order {m.value['ticket_id']} {m.value['status']}", flush=True)
 except KeyboardInterrupt:
     pass
 finally:
