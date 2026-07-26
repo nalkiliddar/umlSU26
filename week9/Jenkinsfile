@@ -19,6 +19,7 @@ pipeline {
             }
         }
         stage('Build & push image') {
+            when {branch 'main'}
             steps {
                 sh '''
                     docker build -t ${REGISTRY}/${IMAGE}:${TAG} week9/app
