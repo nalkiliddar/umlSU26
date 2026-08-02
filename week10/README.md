@@ -20,10 +20,10 @@ Auto-create is off on purpose (you name your topics deliberately), so create the
 
 ```bash
 docker compose up -d
-for t in orders orders.dlq ci.images ci.tests ci.images.dlq; do
+for t in orders orders.dlq ci.images ci.images.dlq; do
   docker exec week10-kafka /opt/kafka/bin/kafka-topics.sh \
     --bootstrap-server localhost:9092 --create --topic "$t" \
-    --partitions 1 --replication-factor 1
+    --partitions 1 --replication-factor 1 --if-not-exists
 done
 ```
 
@@ -35,20 +35,21 @@ done
 work, and shows the three patterns you write by hand this week: retry with backoff,
 idempotency (a dedup check against a `ledger.txt`), and dead-letter routing.
 
-**Redelivery + idempotency.** Send a batch, start the consumer, then kill it
-(Ctrl-C) while it is mid-order. Restart it: the uncommitted order is redelivered,
-and the idempotency check recognizes it and skips it (no double-apply).
+**Redelivery + idempotency.** `RESET=1` starts a demo over (rewind to the first
+message, clear the ledger); a plain run **resumes** from where it left off — that
+resume is what redelivers a killed order. `IDEMPOTENCY=off` turns the idempotency check off.
 
 ```bash
-python producer.py          # 5 orders
-python consumer.py          # apply them; kill mid-batch, then restart
+python producer.py                     # 5 orders
+IDEMPOTENCY=off RESET=1 python consumer.py    # start fresh; kill it (Ctrl-C) mid-batch...
+IDEMPOTENCY=off python consumer.py            # ...resume: the redelivered order applies TWICE
 ```
 
-See the bug idempotency prevents — turn the dedup check off and the redelivered
-order is applied twice:
+Now with idempotency on (the default), the redelivered order is skipped instead:
 
 ```bash
-DEDUP=off python consumer.py
+RESET=1 python consumer.py              # start fresh; kill mid-batch...
+python consumer.py                      # ...resume: the redelivered order is skipped
 ```
 
 **Dead-letter.** Inject a poison (malformed) message; the consumer retries it with
@@ -66,33 +67,36 @@ docker exec week10-kafka /opt/kafka/bin/kafka-console-consumer.sh \
 
 ## Part 2 — Capstone: react to your build, reliably
 
-The Week 9 pipeline announced `ImagePushed` and stopped. Here two consumers react:
+The Week 9 pipeline announced `ImagePushed` and stopped. Here one consumer reacts.
 
-- **`tester.py`** — on `ImagePushed`, deploys the image (`docker pull` + run) and
-  acceptance-tests it (`GET /sum?a=1&b=2` must be `3`), then announces `TestsPassed`
-  or `TestsFailed`. Idempotent (skip a tag already tested), retries the check while
-  the container starts, dead-letters an image that never becomes testable.
-- **`promoter.py`** — on `TestsPassed`, tags the image `:latest` and pushes it.
-  Idempotent: never promotes the same tag twice.
-- **`app/`** — a tiny Flask `/sum` service (the real, testable image; replaces the
-  Week 9 throwaway).
-- **`emit_imagepushed.py`** — stands in for the pipeline's announce so you can drive
-  the chain without Jenkins.
+- **`release_gate.py`** (skeleton) reads each `ImagePushed` event, deploys the image
+  (`docker pull` and run), acceptance-tests it (`GET /sum?a=1&b=2` must be `3`), and
+  promotes it to `:latest` when the test passes. It does nothing when the test fails.
+  The docker and HTTP helpers are written for you. You complete the consumer loop and
+  the three reliability patterns (idempotency, retry with backoff, dead-letter) plus
+  commit-after-processing. See Exercise 10.
+- **`calculator/`** is the Spring Boot `/sum` service (Java, listens on 8080), built
+  into the image the gate tests. Its `Dockerfile` and `Jenkinsfile` are included.
+- **`emit_imagepushed.py`** stands in for the pipeline's announce so you can drive the
+  flow without Jenkins.
 
-The chain is **`ImagePushed` → (deploy + test) → `TestsPassed` → (promote)**.
+The flow is `ImagePushed`, then deploy and test, then promote when it passes.
+
+Build and announce it with the pipeline (`calculator/Jenkinsfile`, a Pipeline from SCM
+job), or do it by hand:
 
 ```bash
-# build + push the app image to the local registry (as the pipeline would)
-docker build -t localhost:5001/calculator:1 app
+# build and push the calculator image to the local registry (as the pipeline would)
+docker build -t localhost:5001/calculator:1 calculator
 docker push localhost:5001/calculator:1
 
-python tester.py      # terminal 1
-python promoter.py    # terminal 2
-python emit_imagepushed.py 1   # terminal 3 -> watch it deploy, test, pass, promote
+python release_gate.py            # terminal 1 (after you complete it)
+python emit_imagepushed.py 1      # terminal 2, watch it deploy, test, and promote
 ```
 
-The tester deploys on host port **18080**; change `HOST_PORT` in `tester.py` if that
-is taken. Requires the local registry from Week 9 (`localhost:5001`).
+The gate maps the container's 8080 to host port **18080**. Change `HOST_PORT` in
+`release_gate.py` if that port is taken. It needs the local registry from Week 9
+(`localhost:5001`).
 
 ---
 
