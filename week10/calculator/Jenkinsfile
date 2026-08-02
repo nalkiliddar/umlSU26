@@ -22,7 +22,7 @@ pipeline {
         BROKER   = 'week10-kafka:29092'
     }
     stages {
-        stage('Build & push image') {
+        stage('Build & push the image') {
             agent any
             steps {
                 sh '''
