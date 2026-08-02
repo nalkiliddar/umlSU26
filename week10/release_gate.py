@@ -91,15 +91,16 @@ for msg in consumer:
     deploy(version)
     test= run_tests()
     if test:
-            print(f"test successful {version}")
-            promote(version)
-        else print(f"test failed {version} ")
+        print(f"test successful {version}")
+        promote(version)
+    else:
+        print(f"test failed {version}")
       
-          
-finally:  
-teardown(version)
-print(f"Done with Candidate Container")
- 
+         
+   
+    teardown(version)
+    print(f"Done with Candidate Container")
+
 
     # TODO: read the version from the event.
     # TODO: deploy(version), then run_tests(). If it passes, promote(version).
