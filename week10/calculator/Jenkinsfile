@@ -39,7 +39,7 @@ pipeline {
                 }
             }
             steps {
-                sh "python week10/calculator/publish_event.py' --image ${REGISTRY}/${IMAGE}:${VERSION}"
+                sh "python week10/calculator/publish_event.py --image ${REGISTRY}/${IMAGE}:${VERSION}"
             }
         }
     }
