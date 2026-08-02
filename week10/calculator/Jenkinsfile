@@ -10,7 +10,7 @@
 //   - the local registry at localhost:5001
 //   - the Week 10 broker up (docker compose in week10), network week10_default
 //   - the kafka-python agent image built once from week9/Dockerfile:
-//       docker build -t localhost:5001/kafka-python:1 week9
+//       docker build -t localhost:5001/kafka-python:1 .
 //       docker push  localhost:5001/kafka-python:1
 pipeline {
     agent none
