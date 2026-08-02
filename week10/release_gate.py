@@ -86,7 +86,20 @@ consumer = KafkaConsumer(
 print("release gate up — waiting for ImagePushed events. Ctrl-C to stop.")
 for msg in consumer:
     event = msg.value
+    version = event.get('version')
     print(f"[event] {event}")
+    deploy(version)
+    test= run_tests()
+    if test:
+            print(f"test successful {version}")
+            promote(version)
+        else print(f"test failed {version} ")
+      
+          
+finally:  
+teardown(version)
+print(f"Done with Candidate Container")
+ 
 
     # TODO: read the version from the event.
     # TODO: deploy(version), then run_tests(). If it passes, promote(version).
