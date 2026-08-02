@@ -13,7 +13,7 @@
 //       docker build -t localhost:5001/kafka-python:1 week9
 //       docker push  localhost:5001/kafka-python:1
 pipeline {
-    agent none
+    agent any
     environment {
         REGISTRY = 'localhost:5001'
         IMAGE    = 'calculator'
