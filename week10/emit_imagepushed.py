@@ -16,6 +16,6 @@ producer = KafkaProducer(
     value_serializer=lambda v: json.dumps(v).encode(),
 )
 event = {"event": "ImagePushed", "image": "calculator", "version": version, "registry": "localhost:5001"}
-producer.send("ci.images", event).get(timeout=10)
+producer.send("ci.images", event)
 producer.flush()
 print("emitted", event)
