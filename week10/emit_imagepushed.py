@@ -9,8 +9,10 @@ from kafka import KafkaProducer
 
 version = sys.argv[1] if len(sys.argv) > 1 else "1"
 
-# DYNAMIC FIX: Uses 'localhost:9092' if run on Windows, or 'week10-kafka:9092' if run inside Docker
-BROKER = "week10-kafka:9092" 
+# Connect directly to the hostname advertised by the broker
+BROKER = "week10-kafka:9092"
+
+print(f"Connecting to broker [{BROKER}] to emit event for version {version}...")
 
 producer = KafkaProducer(
     bootstrap_servers=BROKER,
@@ -18,9 +20,17 @@ producer = KafkaProducer(
     value_serializer=lambda v: json.dumps(v).encode('utf-8'),
 )
 
-event = {"event": "ImagePushed", "image": "calculator", "version": version, "registry": "localhost:5001"}
-print(f"Connecting to broker [{BROKER}] to emit event...")
+event = {
+    "event": "ImagePushed", 
+    "image": "calculator", 
+    "version": version, 
+    "registry": "localhost:5001"
+}
 
-producer.send("ci.images", event)
-producer.flush()
-print("emitted", event)
+try:
+    # Send the message and force an instant 5-second failure check
+    producer.send("ci.images", event).get(timeout=5)
+    producer.flush()
+    print(f"🎉 Emitted successfully to cluster log: {event}")
+except Exception as e:
+    print(f"❌ Failed to send event: {e}")
