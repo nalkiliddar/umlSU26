@@ -19,9 +19,9 @@ import urllib.request
 
 from kafka import KafkaConsumer
 
-BROKER = "localhost:9092"
+BROKER = os.environ.get("BROKER", "week10-kafka:9092")
 IN = "ci.images"
-REGISTRY = "localhost:5001"
+REGISTRY = os.environ.get("REGISTRY","local-registry:5001")
 HOST_PORT = 18080          # host port we expose the candidate container on
 
 
