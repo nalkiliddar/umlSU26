@@ -43,16 +43,15 @@ pipeline {
             }
         }
         stage('Promote on success') {
-            agent { 
-                docker { 
-                    image 'localhost:5001/kafka-python:1' 
-                    args '--network week10_default'
-                } 
-            }
             steps {
+                // Force the execution to use the shared network environment variables manually
+                withEnv([
+                    "BROKER=week10-kafka:9092",
+                    "REGISTRY=localhost:5001"
+                ]) {
+                // Run the single-pass version of your script so the stage finishes successfully
                 sh 'python week10/release_gate.py'
             }
-}
-  
-    }
+       }
+     }
 }
