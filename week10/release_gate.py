@@ -22,7 +22,7 @@ from kafka import KafkaConsumer
 
 BROKER = os.environ.get("BROKER", "week10-kafka:9092")
 IN = "ci.images"
-REGISTRY = os.environ.get("REGISTRY","local-registry:5001")
+REGISTRY = "localhost:5001"
 HOST_PORT = 18080          # host port we expose the candidate container on
 
 
