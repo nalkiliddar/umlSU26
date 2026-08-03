@@ -10,7 +10,7 @@ from kafka import KafkaProducer
 version = sys.argv[1] if len(sys.argv) > 1 else "1"
 
 # DYNAMIC FIX: Uses 'localhost:9092' if run on Windows, or 'week10-kafka:9092' if run inside Docker
-BROKER = "localhost:9092" if sys.platform == "win32" else "week10-kafka:9092"
+BROKER = "week10-kafka:9092" 
 
 producer = KafkaProducer(
     bootstrap_servers=BROKER,
