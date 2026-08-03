@@ -79,7 +79,7 @@ def teardown(version):
 consumer = KafkaConsumer(
     IN,
     bootstrap_servers=BROKER,
-    group_id="release-gate",
+    group_id="release-gate-v2", # Changed name to force Kafka to read from the 'earliest' offset again
     auto_offset_reset="earliest",
     api_version=(2, 5, 0),
     value_deserializer=lambda b: json.loads(b.decode()),
@@ -88,21 +88,34 @@ consumer = KafkaConsumer(
 print("release gate up — waiting for ImagePushed events. Ctrl-C to stop.")
 for msg in consumer:
     event = msg.value
+    print(f"\n[Received Event]: {event}")
+    
+    # Safely unpack the version
     version = event.get('version')
-    print(f"[event] {event}")
-    deploy(version)
-    test= run_tests()
-    if test:
-        print(f"test successful {version}")
-        promote(version)
-    else:
-        print(f"test failed {version}")
-      
-         
-   
-    teardown(version)
-    print(f"Done with Candidate Container")
-
+    if not version:
+        print("No version found in event payload. Skipping.")
+        continue
+        
+    print(f"Deploying candidate version: {version}")
+    try:
+        deploy(version)
+        
+        print("Running acceptance tests...")
+        test_passed = run_tests()
+        
+        if test_passed:
+            print(f"--> Test successful for version {version}. Promoting...")
+            promote(version)
+        else:
+            print(f"--> Test failed for version {version}. Skipping promotion.")
+            
+    except Exception as e:
+        print(f"Pipeline error encountered: {e}")
+        
+    finally:
+        print(f"Cleaning up candidate container for version {version}...")
+        teardown(version)
+        print("Done with Candidate Container. Awaiting next event...")
 
     # TODO: read the version from the event.
     # TODO: deploy(version), then run_tests(). If it passes, promote(version).
