@@ -24,6 +24,6 @@ event = {
     "registry": "localhost:5001",
     "version": os.environ["VERSION"]
 }
-producer.send(os.environ.get("TOPIC", "ci.images"), event).get(timeout=10)
+producer.send(os.environ.get("TOPIC", "ci.images"), event)
 producer.flush()
 print("announced:", event)
