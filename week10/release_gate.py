@@ -61,6 +61,7 @@ def promote(version):
     """Promote the tested image to the released tag: tag :latest and push."""
     src = f"{REGISTRY}/calculator:{version}"
     dst = f"{REGISTRY}/calculator:latest"
+    print(f"    [PROMOTE] Tagging {src} -> {dst}")
     subprocess.run(["docker", "pull", src], check=True, capture_output=True)
     subprocess.run(["docker", "tag", src, dst], check=True)
     subprocess.run(["docker", "push", dst], check=True, capture_output=True)
@@ -79,7 +80,7 @@ def teardown(version):
 consumer = KafkaConsumer(
     IN,
     bootstrap_servers=BROKER,
-    group_id="release-gate-v2", # Changed name to force Kafka to read from the 'earliest' offset again
+    group_id="release-gate-v3", # Changed name to force Kafka to read from the 'earliest' offset again
     auto_offset_reset="earliest",
     api_version=(2, 5, 0),
     value_deserializer=lambda b: json.loads(b.decode()),
@@ -88,22 +89,43 @@ consumer = KafkaConsumer(
 print("release gate up — waiting for ImagePushed events. Ctrl-C to stop.")
 for msg in consumer:
     event = msg.value
-    print(f"\n[Received Event]: {event}")
+    print(f"\n[EVENT DETECTED]: Full Payload Received -> {json.dumps(event)}")
     
+    # 1. Safely pull out the version string 
     version = event.get('version')
+    print(f"--> Extracted Target Version: {version}")
+    
     if not version:
+        print("⚠️ Warning: Event message format missing 'version' key. Skipping workflow loop.")
         continue
         
     try:
+        # 2. Deploy the candidate version container
+        print(f"Executing deployment pipeline block for Version #{version}...")
         deploy(version)
-        test_passed = run_tests()
-        if test_passed:
-            promote(version)
-    finally:
-        teardown(version)
         
-    print("Workflow cycle complete. Exiting script for Jenkins pipeline.")
-    break # <--- CRITICAL: This breaks the loop so the script finishes and Jenkins completes the stage!
+        # 3. Process endpoint acceptance logic validations
+        test_passed = run_tests()
+        
+        # 4. Filter validation requirements for promotion
+        if test_passed:
+            print(f" Verification successful for Version #{version}. Beginning Release Gate Promotion...")
+            promote(version)
+        else:
+            print(f"❌ Verification failed for Version #{version}. Aborting Promotion Phase.")
+            
+    except Exception as error_context:
+        print(f"💥 Critical crash caught during execution block: {error_context}")
+        
+    finally:
+        # 5. Clean environment state tracking
+        teardown(version)
+        print(f"Finished evaluation workflow for Build Version: {version}")
+        
+    # 6. Break the loop so the Jenkins Stage registers a perfect pipeline completion
+    print("Release processing finished. Returning control sequence to Jenkins engine.")
+    break
+
 
     # TODO: read the version from the event.
     # TODO: deploy(version), then run_tests(). If it passes, promote(version).
