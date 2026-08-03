@@ -16,6 +16,7 @@ import json
 import subprocess
 import time
 import urllib.request
+import os
 
 from kafka import KafkaConsumer
 
