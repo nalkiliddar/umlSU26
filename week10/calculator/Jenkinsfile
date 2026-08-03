@@ -43,9 +43,16 @@ pipeline {
             }
         }
         stage('Release_Gate') {
+            agent { 
+                docker { 
+                    image 'localhost:5001/kafka-python:1' 
+                    args '--network week10_default'
+                } 
+            }
             steps {
                 sh 'python week10/release_gate.py'
             }
-        }    
+}
+  
     }
 }
