@@ -83,7 +83,8 @@ consumer = KafkaConsumer(
     group_id="release-gate-v4", # Changed name to force Kafka to read from the 'earliest' offset again
     auto_offset_reset="earliest",
     api_version=(2, 5, 0),
-    request_timeout_ms=5000,
+    session_timeout_ms=6000,
+    request_timeout_ms=7000,
     metadata_max_age_ms=5000,
     value_deserializer=lambda b: json.loads(b.decode()),
 )
