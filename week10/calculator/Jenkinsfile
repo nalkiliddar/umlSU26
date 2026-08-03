@@ -43,15 +43,15 @@ pipeline {
             }
         }
         stage('Promote on success') {
-            agent {
-                docker {
-                    image 'localhost:5001/kafka-python:1'
-                    args '--network week10_default -v /var/run/docker.sock:/var/run/docker.sock -u 0:0'
-                }
-            }    
+            
             steps {
+                withEnv([
+                    "BROKER=week10-kafka:9092",
+                    "REGISTRY=localhost:5001"
+                ]) {
                 sh 'python week10/release_gate.py'
-            }
+                }
+            }     
         }
      }
 }
