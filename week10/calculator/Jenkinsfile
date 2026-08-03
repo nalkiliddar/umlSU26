@@ -19,7 +19,7 @@ pipeline {
         IMAGE    = 'calculator'
         VERSION  = "${BUILD_NUMBER}"
         TOPIC    = 'ci.images'
-        BROKER   = 'week10-kafka:29092'
+        BROKER   = 'week10-kafka:9092'
     }
     stages {
         stage('Build & push the image') {
