@@ -30,7 +30,7 @@ pipeline {
                     # Force local compilation context to completely bypass the remote ping error
                     export DOCKER_BUILDKIT=0
                     export DOCKER_HOST=unix:///var/run/docker.sock
-                    docker build -t ${REGISTRY}/${IMAGE}:${VERSION} week10/calculator
+                    docker build --dns 8.8.8.8 -t ${REGISTRY}/${IMAGE}:${VERSION} week10/calculator
                     docker push ${REGISTRY}/${IMAGE}:${VERSION}
                 '''
             }
