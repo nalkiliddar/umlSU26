@@ -80,12 +80,9 @@ def teardown(version):
 consumer = KafkaConsumer(
     IN,
     bootstrap_servers=BROKER,
-    group_id="release-gate-v4", # Changed name to force Kafka to read from the 'earliest' offset again
+    group_id="release-gate-final-v1 # Changed name to force Kafka to read from the 'earliest' offset again
     auto_offset_reset="earliest",
     api_version=(2, 5, 0),
-    session_timeout_ms=6000,
-    request_timeout_ms=7000,
-    metadata_max_age_ms=5000,
     value_deserializer=lambda b: json.loads(b.decode()),
 )
 
