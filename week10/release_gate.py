@@ -80,6 +80,7 @@ consumer = KafkaConsumer(
     bootstrap_servers=BROKER,
     group_id="release-gate",
     auto_offset_reset="earliest",
+    api_version=(2, 5, 0),
     value_deserializer=lambda b: json.loads(b.decode()),
 )
 
