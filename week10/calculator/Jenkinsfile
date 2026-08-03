@@ -52,8 +52,7 @@ pipeline {
             }   
             steps {
                 sh 'python week10/release_gate.py'
-                }
-            }     
+            }                 
         }
      }
 }
