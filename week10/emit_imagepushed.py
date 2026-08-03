@@ -11,7 +11,8 @@ from kafka import KafkaProducer
 version = sys.argv[1] if len(sys.argv) > 1 else "1"
 
 producer = KafkaProducer(
-    bootstrap_servers="localhost:9092",
+    bootstrap_servers="week10-kafka:9092",
+    api_version=(2, 5, 0),
     value_serializer=lambda v: json.dumps(v).encode(),
 )
 event = {"event": "ImagePushed", "image": "calculator", "version": version, "registry": "localhost:5001"}
