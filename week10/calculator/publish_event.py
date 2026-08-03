@@ -14,7 +14,7 @@ import os
 from kafka import KafkaProducer
 
 producer = KafkaProducer(
-    bootstrap_servers=os.environ.get("BROKER", "week10-kafka:29092"),
+    bootstrap_servers=os.environ.get("BROKER", "week10-kafka:9092"),
     api_version=(2, 5, 0),
     value_serializer=lambda v: json.dumps(v).encode("utf-8"),
 )
