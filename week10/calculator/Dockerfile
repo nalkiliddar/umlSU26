@@ -2,8 +2,19 @@
 # The wrapper pins the Gradle version, so only the JDK has to match the project.
 FROM eclipse-temurin:8-jdk AS build
 WORKDIR /src
+
+# 1. Copy ONLY the Gradle wrapper configuration files
+COPY gradlew .
+COPY gradle/wrapper/gradle-wrapper.properties gradle/wrapper/gradle-wrapper.properties
+
+# 2. Download and cache the Gradle distribution binaries (cached across builds)
+RUN chmod +x gradlew && ./gradlew --version --no-daemon
+
+# 3. Copy the rest of your Java source code
 COPY . .
-RUN chmod +x gradlew && ./gradlew bootJar --no-daemon
+
+# 4. Compile the jar (will use the pre-downloaded Gradle distribution)
+RUN ./gradlew bootJar --no-daemon
 
 # Run it on a small JRE. Spring Boot listens on 8080.
 FROM eclipse-temurin:8-jre
