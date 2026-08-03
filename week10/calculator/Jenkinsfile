@@ -30,7 +30,8 @@ pipeline {
                     # Force local compilation context to completely bypass the remote ping error
                     export DOCKER_BUILDKIT=0
                     export DOCKER_HOST=unix:///var/run/docker.sock
-                    
+                    chmod +x week10/calculator/gradlew
+                    GRADLE_USER_HOME=\$(pwd)/week10/calculator/.gradle_home ./week10/calculator/gradlew --version
                     docker build -t ${REGISTRY}/${IMAGE}:${VERSION} week10/calculator
                     docker push ${REGISTRY}/${IMAGE}:${VERSION}
                 '''
