@@ -42,7 +42,7 @@ pipeline {
                 sh "python week10/calculator/publish_event.py --image ${REGISTRY}/${IMAGE}:${VERSION}"
             }
         }
-        stage('Release_Gate') {
+        stage('Promote on success') {
             agent { 
                 docker { 
                     image 'localhost:5001/kafka-python:1' 
