@@ -31,7 +31,7 @@ pipeline {
                 '''
             }
         }
-        stage('Announce to Kafka') {
+        stage('Announce to Kafka-') {
             agent {
                 docker {
                     image 'localhost:5001/kafka-python:1'
