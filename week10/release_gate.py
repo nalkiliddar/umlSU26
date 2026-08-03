@@ -90,32 +90,20 @@ for msg in consumer:
     event = msg.value
     print(f"\n[Received Event]: {event}")
     
-    # Safely unpack the version
     version = event.get('version')
     if not version:
-        print("No version found in event payload. Skipping.")
         continue
         
-    print(f"Deploying candidate version: {version}")
     try:
         deploy(version)
-        
-        print("Running acceptance tests...")
         test_passed = run_tests()
-        
         if test_passed:
-            print(f"--> Test successful for version {version}. Promoting...")
             promote(version)
-        else:
-            print(f"--> Test failed for version {version}. Skipping promotion.")
-            
-    except Exception as e:
-        print(f"Pipeline error encountered: {e}")
-        
     finally:
-        print(f"Cleaning up candidate container for version {version}...")
         teardown(version)
-        print("Done with Candidate Container. Awaiting next event...")
+        
+    print("Workflow cycle complete. Exiting script for Jenkins pipeline.")
+    break # <--- CRITICAL: This breaks the loop so the script finishes and Jenkins completes the stage!
 
     # TODO: read the version from the event.
     # TODO: deploy(version), then run_tests(). If it passes, promote(version).
