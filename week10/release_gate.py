@@ -29,8 +29,14 @@ except ModuleNotFoundError:
 
 BROKER = os.environ.get("BROKER", "week10-kafka:9092")
 IN = "ci.images"
-REGISTRY = "localhost:5001"
-HOST_PORT = 18080          # host port we expose the candidate container on
+HOST_PORT = 18080          
+
+# --- DYNAMIC REGISTRY RESOLUTION BLOCK ---
+# If running inside the Jenkins container filesystem, route over the docker bridge to local-registry:5000
+if os.path.exists("/var/jenkins_home") or os.environ.get("JENKINS_HOME"):
+    REGISTRY = "local-registry:5000"
+else:
+    REGISTRY = "localhost:5001"
 
 
 # ===========================================================================
