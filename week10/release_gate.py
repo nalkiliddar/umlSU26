@@ -17,8 +17,15 @@ import subprocess
 import time
 import urllib.request
 import os
+import sys
 
-from kafka import KafkaConsumer
+# --- Force Auto-Install Kafka library if it's missing ---
+try:
+    from kafka import KafkaConsumer
+except ModuleNotFoundError:
+    print("📦 'kafka' module missing inside Jenkins environment. Attempting runtime installation...")
+    subprocess.run([sys.executable, "-m", "pip", "install", "kafka-python", "--break-system-packages"], check=True)
+    from kafka import KafkaConsumer
 
 BROKER = os.environ.get("BROKER", "week10-kafka:9092")
 IN = "ci.images"
