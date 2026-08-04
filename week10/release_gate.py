@@ -87,7 +87,7 @@ def teardown(version):
 consumer = KafkaConsumer(
     IN,
     bootstrap_servers=BROKER,
-    group_id="release-gate-final-v2", # Changed name to force Kafka to read from the 'earliest' offset again
+    group_id="release-gate-final-v3", # Changed name to force Kafka to read from the 'earliest' offset again
     auto_offset_reset="earliest",
     api_version=(2, 5, 0),
     value_deserializer=lambda b: json.loads(b.decode()),
@@ -96,41 +96,40 @@ consumer = KafkaConsumer(
 print("release gate up — waiting for ImagePushed events. Ctrl-C to stop.")
 for msg in consumer:
     event = msg.value
-    print(f"\n[EVENT DETECTED]: Full Payload Received -> {json.dumps(event)}")
-    
-    # 1. Safely pull out the version string 
+    print(f"\n[EVENT Received]: Full Payload Received -> {json.dumps(event)}")
+        
     version = event.get('version')
-    print(f"--> Extracted Target Version: {version}")
+    print(f"--> Extracted Version: {version}")
     
     if not version:
         print("⚠️ Warning: Event message format missing 'version' key. Skipping workflow loop.")
         continue
         
     try:
-        # 2. Deploy the candidate version container
-        print(f"Executing deployment pipeline block for Version #{version}...")
+        
+        print(f" Start Deployment pipeline or Version #{version}...")
         deploy(version)
         
-        # 3. Process endpoint acceptance logic validations
+        
         test_passed = run_tests()
         
-        # 4. Filter validation requirements for promotion
+        # 4. 
         if test_passed:
-            print(f" Verification successful for Version #{version}. Beginning Release Gate Promotion...")
+            print(f" Test successful for Version #{version}. Begin Promote...")
             promote(version)
         else:
-            print(f"❌ Verification failed for Version #{version}. Aborting Promotion Phase.")
+            print(f"❌ Test failed for Version #{version}. Abort.")
             
     except Exception as error_context:
-        print(f"💥 Critical crash caught during execution block: {error_context}")
+        print(f"Exception: {error_context}")
         
     finally:
-        # 5. Clean environment state tracking
-        teardown(version)
-        print(f"Finished evaluation workflow for Build Version: {version}")
         
-    # 6. Break the loop so the Jenkins Stage registers a perfect pipeline completion
-    print("Release processing finished. Returning control sequence to Jenkins engine.")
+        teardown(version)
+        print(f"Work is complete for Build Version: {version}")
+        
+    
+    print("Processing completed successfully.")
     break
 
 
