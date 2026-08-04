@@ -62,8 +62,8 @@ def run_tests():
     for _ in range(15):
         try:
             answer = urllib.request.urlopen(url, timeout=2).read().decode().strip()
-            print(f"    GET /sum?a=1&b=2 -> {answer!r} (want '3')")
-            return answer == "3"
+            print(f"    GET /sum?a=1&b=2 -> {answer!r} (want 'a-b')")
+            return answer == "a-b"
         except OSError:
             time.sleep(1)          # not up yet, wait and retry
     print("    service never came up")
