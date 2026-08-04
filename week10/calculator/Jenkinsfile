@@ -47,6 +47,7 @@ pipeline {
         stage('Promote on success') {
             agent any
             steps {
+                sh 'docker network connect week10_default Jenkins-gradle || true'
                 sh 'PYTHONUNBUFFERED=1 python3 week10/release_gate.py'
             }                 
         }
