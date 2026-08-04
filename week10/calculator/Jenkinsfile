@@ -12,7 +12,7 @@
 //   - the kafka-python agent image built once from week9/Dockerfile:
 //       docker build -t localhost:5001/kafka-python:1 .
 //       docker push  localhost:5001/kafka-python:1
-//  Update8
+//  Update9
 pipeline {
     agent none
     environment {
