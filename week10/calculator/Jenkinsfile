@@ -12,7 +12,6 @@
 //   - the kafka-python agent image built once from week9/Dockerfile:
 //       docker build -t localhost:5001/kafka-python:1 .
 //       docker push  localhost:5001/kafka-python:1
-//  Update13
 pipeline {
     agent none
     environment {
@@ -43,13 +42,6 @@ pipeline {
             steps {
                 sh "python week10/calculator/publish_event.py --image ${REGISTRY}/${IMAGE}:${VERSION}"
             }
-        }
-        stage('Promote on success') {
-            agent any
-            steps {
-                sh 'docker network connect week10_default Jenkins-gradle || true'
-                sh 'PYTHONUNBUFFERED=1 python3 week10/release_gate.py'
-            }                 
         }
     }
 }
