@@ -47,7 +47,7 @@ pipeline {
         stage('Promote on success') {
             agent any
             steps {
-                sh 'python3 week10/release_gate.py'
+                sh 'PYTHONUNBUFFERED=1 python3 week10/release_gate.py'
             }                 
         }
     }
