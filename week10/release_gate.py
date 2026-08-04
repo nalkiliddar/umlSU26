@@ -19,24 +19,13 @@ import urllib.request
 import os
 import sys
 
-# --- Force Auto-Install Kafka library if it's missing ---
-try:
-    from kafka import KafkaConsumer
-except ModuleNotFoundError:
-    print("📦 'kafka' module missing inside Jenkins environment. Attempting runtime installation...")
-    subprocess.run([sys.executable, "-m", "pip", "install", "kafka-python", "--break-system-packages"], check=True)
-    from kafka import KafkaConsumer
+
+from kafka import KafkaConsumer
 
 BROKER = os.environ.get("BROKER", "week10-kafka:9092")
 IN = "ci.images"
-HOST_PORT = 18080          
-
-# --- DYNAMIC REGISTRY RESOLUTION BLOCK ---
-# If running inside the Jenkins container filesystem, route over the docker bridge to local-registry:5000
-if os.path.exists("/var/jenkins_home") or os.environ.get("JENKINS_HOME"):
-    REGISTRY = "local-registry:5000"
-else:
-    REGISTRY = "localhost:5001"
+HOST_PORT = 18080   
+REGISTRY = "localhost:5001"
 
 
 # ===========================================================================
@@ -103,24 +92,23 @@ print("release gate up — waiting for ImagePushed events. Ctrl-C to stop.")
 for msg in consumer:
     event = msg.value
     print(f"\n[EVENT Received]: Full Payload Received -> {json.dumps(event)}")
-        
+      
     version = event.get('version')
     print(f"--> Extracted Version: {version}")
     
     if not version:
-        print("⚠️ Warning: Event message format missing 'version' key. Skipping workflow loop.")
+        print("missing 'version' key. Skip.")
         continue
         
     try:
         
-        print(f" Start Deployment pipeline or Version #{version}...")
+        print(f" Start Deployment pipeline for Version #{version}...")
         deploy(version)
+               
+        test = run_tests()
         
-        
-        test_passed = run_tests()
-        
-        # 4. 
-        if test_passed:
+      
+        if test:
             print(f" Test successful for Version #{version}. Begin Promote...")
             promote(version)
         else:
