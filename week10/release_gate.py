@@ -87,8 +87,8 @@ def teardown(version):
 consumer = KafkaConsumer(
     IN,
     bootstrap_servers=BROKER,
-    group_id="release-gate-final-v3", # Changed name to force Kafka to read from the 'earliest' offset again
-    auto_offset_reset="earliest",
+    group_id="release-gate-final-v4", # Changed name to force Kafka to read from the 'earliest' offset again
+    auto_offset_reset="latest",
     api_version=(2, 5, 0),
     value_deserializer=lambda b: json.loads(b.decode()),
 )
@@ -118,7 +118,7 @@ for msg in consumer:
             print(f" Test successful for Version #{version}. Begin Promote...")
             promote(version)
         else:
-            print(f"❌ Test failed for Version #{version}. Abort.")
+            print(f"Test failed for Version #{version}. Abort.")
             
     except Exception as error_context:
         print(f"Exception: {error_context}")
