@@ -3,9 +3,8 @@ name: calculator ci
 on:
   workflow_dispatch:
   push:
-    paths:
-      - "week10/calculator/**"
-      - ".github/workflows/calculator-ci.yml"
+    branches: [ "main" ]
+     
 
 jobs:
   unit-test:
@@ -25,7 +24,7 @@ jobs:
         working-directory: week10/calculator
         run: |
           chmod +x gradlew
-          ./gradlew clean test && false
+          ./gradlew clean test 
           
           
             
