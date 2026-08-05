@@ -1,4 +1,4 @@
-# UML DevOps — Summer 2026 (MSIT.5330)- Task 3
+# UML DevOps — Summer 2026 (MSIT.5330)- Task 4
 
 Lab starter files for the course. Each `weekN/` folder holds that week's lab; clone
 or download this repo to get the starters referenced in the weekly notes and exercises.
