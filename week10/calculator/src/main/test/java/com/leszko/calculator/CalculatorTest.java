@@ -19,7 +19,7 @@ public class CalculatorTest {
 
 	@Test
 	public void testSumZero() {
-		assertThat(calculator.sum(2, 3)).isEqualTo(5);
+		assertThat(calculator.sum(2, 3)).isEqualTo(99); 
 		
 	}
 
