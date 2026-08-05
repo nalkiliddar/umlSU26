@@ -26,6 +26,9 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew clean test
+          echo "Simulating a failed unit test step!"     
+          
+            
 
   build-and-test:
     runs-on: ubuntu-latest
