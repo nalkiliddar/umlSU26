@@ -19,7 +19,8 @@ public class CalculatorTest {
 
 	@Test
 	public void testSumZero() {
-		throw new RuntimeException("Forcing a pipeline failure now!"); 
+		assertThat(calculator.sum(0, 0)).isEqualTo(0);
+		assertThat(calculator.sum(5, 0)).isEqualTo(10); 
 		
 	}
 
