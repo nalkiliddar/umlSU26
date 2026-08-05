@@ -20,7 +20,7 @@ public class CalculatorTest {
 	@Test
 	public void testSumZero() {
 		assertThat(calculator.sum(0, 0)).isEqualTo(0);
-		assertThat(calculator.sum(5, 0)).isEqualTo(5);
+		assertThat(calculator.sum(5, 0)).isEqualTo(10);
 	}
 
 	@Test
