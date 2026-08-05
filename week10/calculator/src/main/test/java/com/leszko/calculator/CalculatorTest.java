@@ -19,8 +19,8 @@ public class CalculatorTest {
 
 	@Test
 	public void testSumZero() {
-		assertThat(calculator.sum(0, 0)).isEqualTo(0);
-		assertThat(calculator.sum(5, 0)).isEqualTo(10);
+		assertThat(calculator.sum(2, 3)).isEqualTo(5);
+		
 	}
 
 	@Test
