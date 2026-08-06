@@ -27,7 +27,7 @@ jobs:
         working-directory: week10/calculator
         run: |
           chmod +x gradlew
-          ./gradlew clean test 
+          ./gradlew clean test -Dgradle.continue=false
           
           
             
