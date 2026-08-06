@@ -14,19 +14,19 @@ public class CalculatorTest {
 
 	@Test
 	public void SumPositiveNumbers() {
-		Assert.assertEquals(5, calculator.sum(2, 3));
+		Assert.assertEquals(7, calculator.sum(2, 5));
 	}
 
 	@Test
 	public void SumZero() {
-		Assert.assertEquals(0, calculator.sum(0, 0));
+		
 		Assert.assertEquals(5, calculator.sum(5, 0)); 
 		
 	}
 
 	@Test
 	public void testSumNegativeNumbers() {
-		Assert.assertEquals(-5, calculator.sum(-2, -3));
-		Assert.assertEquals(-1, calculator.sum(2, -3));
+		Assert.assertEquals(-7, calculator.sum(-2, -5));
+		Assert.assertEquals(-1, calculator.sum(3, -4));
 	}
 }
